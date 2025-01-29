@@ -13,7 +13,7 @@
     "@radix-ui/react-slot": "^1.1.1",
     "@radix-ui/react-toast": "^1.2.4",
     "@react-aria/ssr": "3.9.4",
-    "@react-aria/visually-hidden": "3.8.12",
+    "@react-aria/visually-hidden": "3.8.19",
     "@tanstack/react-table": "^8.19.3",
     "add": "^2.0.6",
     "alert": "^6.0.2",
