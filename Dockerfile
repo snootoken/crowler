@@ -4,7 +4,6 @@ FROM python:3.12.8-alpine3.20
 LABEL maintainer="https://github.com/prowler-cloud/prowler"
 
 # Update system dependencies and install essential tools
-# hadolint ignore=DL3018
 RUN apk --no-cache upgrade && apk --no-cache add curl git
 
 # Create non-root user
@@ -27,21 +26,26 @@ COPY README.md /home/prowler
 ENV HOME='/home/prowler'
 ENV PATH="$HOME/.local/bin:$PATH"
 RUN pip install --no-cache-dir --upgrade pip setuptools wheel && \
-    pip install --no-cache-dir .
+    pip install --no-cache-dir flask
 
 # Remove deprecated dash dependencies
 RUN pip uninstall dash-html-components -y && \
     pip uninstall dash-core-components -y
 
-# Remove Prowler directory and build files
-USER 0
-RUN rm -rf /home/prowler/prowler /home/prowler/pyproject.toml /home/prowler/README.md /home/prowler/build /home/prowler/prowler.egg-info
-
-USER prowler
-
 # Ensure Render assigns a port dynamically
 ENV PORT=8080
 EXPOSE 8080
 
-# Keep container running for Render
-CMD ["tail", "-f", "/dev/null"]
+# Create a simple HTTP server
+COPY <<EOF /home/prowler/server.py
+from flask import Flask
+app = Flask(__name__)
+@app.route('/')
+def home():
+    return "Prowler Running"
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=int(8080))
+EOF
+
+# Start the HTTP server to keep the container running
+CMD ["python", "/home/prowler/server.py"]
