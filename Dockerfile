@@ -43,5 +43,5 @@ USER prowler
 ENV PORT=8080
 EXPOSE 8080
 
-# Start Prowler with the correct port binding for Render
-CMD ["prowler"]
+# Keep container running for Render
+CMD ["tail", "-f", "/dev/null"]
