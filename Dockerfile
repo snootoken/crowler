@@ -1,9 +1,10 @@
+# Use latest Python Alpine image
 FROM python:3.12.8-alpine3.20
 
 LABEL maintainer="https://github.com/prowler-cloud/prowler"
 
 # Update system dependencies and install essential tools
-#hadolint ignore=DL3018
+# hadolint ignore=DL3018
 RUN apk --no-cache upgrade && apk --no-cache add curl git
 
 # Create non-root user
@@ -11,11 +12,13 @@ RUN mkdir -p /home/prowler && \
     echo 'prowler:x:1000:1000:prowler:/home/prowler:' > /etc/passwd && \
     echo 'prowler:x:1000:' > /etc/group && \
     chown -R prowler:prowler /home/prowler
+
+# Set up environment
 USER prowler
+WORKDIR /home/prowler
 
 # Copy necessary files
-WORKDIR /home/prowler
-COPY prowler/  /home/prowler/prowler/
+COPY prowler/ /home/prowler/prowler/
 COPY dashboard/ /home/prowler/dashboard/
 COPY pyproject.toml /home/prowler
 COPY README.md /home/prowler
@@ -35,4 +38,10 @@ USER 0
 RUN rm -rf /home/prowler/prowler /home/prowler/pyproject.toml /home/prowler/README.md /home/prowler/build /home/prowler/prowler.egg-info
 
 USER prowler
-ENTRYPOINT ["prowler"]
+
+# Ensure Render assigns a port dynamically
+ENV PORT=8080
+EXPOSE 8080
+
+# Start Prowler with the correct port binding for Render
+CMD ["prowler", "--port", "8080"]
