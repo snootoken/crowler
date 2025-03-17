@@ -74,7 +74,7 @@ jobs:
 
       - name: Test if changes are in not ignored paths
         id: are-non-ignored-files-changed
-        uses: tj-actions/changed-files@v45
+        uses: tj-actions/changed-files@v46
         with:
           files: api/**
           files_ignore: |
